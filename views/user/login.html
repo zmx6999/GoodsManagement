@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/reset.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css">
+    <script type="text/javascript" src="/static/js/jquery-1.12.4.min.js"></script>
+</head>
+<body>
+    <div class="login_logo">
+        <img src="/static/img/logo.png" alt="">
+    </div>
+    <form  class="login_form" id="form">
+        <h1 class="login_title">用户登录</h1>
+        <input type="text"  class="input_txt" name = "username" value="{{.username}}">
+        <input type="password" name = "password"  class="input_txt">
+        <div class="remember"><input type="checkbox" name="remember" {{.remember}}><label>记住用户名</label></div>
+        <input id="submit" type="button" value="登 录" class="input_sub">
+    </form>
+    <div class="login_bg"></div>
+</body>
+<script>
+    var submitting = false
+    $("#submit").click(() => {
+        if (submitting) return
+        submitting=true
+        $.ajax({
+            method:"POST",
+            url:"/login",
+            data:$("#form").serialize(),
+            dataType:"json",
+            success:data => {
+                submitting = false
+                if (data.code == 0) {
+                    location.href="/"
+                } else {
+                    alert(data.msg)
+                }
+            },
+            error:(e,o,s) => {
+                submitting = false
+                alert("error network")
+            }
+        })
+    })
+</script>
+</html>

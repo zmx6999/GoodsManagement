@@ -1,0 +1,71 @@
+    <div class="main_body" id="main_body">
+        <div class="breadcrub">
+            当前位置：商品>编辑商品SKU
+        </div>
+        <div class="pannel" style="height: 810px">
+            <form id="form" enctype="multipart/form-data">
+            <h3 class="review_title">编辑商品SPU</h3>
+                <input type="hidden" name="id" value="{{.goods.Id}}">
+                <div class="form_group">
+                    <label>商品名称：</label>
+                    <input type="text" class="input_txt2" name="name" value="{{.goods.Name}}">
+                </div>
+                <div class="form_group">
+                    <label>商品SPU：</label>
+                    {{.goods.GoodsSPU.Name}}
+                </div>
+                <div class="form_group">
+                    <label>商品描述：</label>
+                    <textarea class="input_multxt" name="detail">{{.goods.Detail}}</textarea>
+                </div>
+                <div class="form_group">
+                    <label>商品库存：</label>
+                    <input type="text" class="input_txt2" name="stock" value="{{.goods.Stock}}">
+                </div>
+                <div class="form_group">
+                    <label>商品价格：</label>
+                    <input type="text" class="input_txt2" name="price" value="{{.goods.Price}}">
+                </div>
+                <div class="form_group">
+                    <label>商品单位：</label>
+                    <input type="text" class="input_txt2" name="unit" value="{{.goods.Unit}}">
+                </div>
+                <div class="form_group">
+                    <label>商品图片：</label>
+                    <img src="http://{{"fdfs_host" | getconfig}}:{{"fdfs_port" | getconfig}}/{{.goods.Image}}" width="200">
+                    <input type="file" class="input_file"  name="image">
+                </div>
+                <div class="form_group indent_group line_top">
+                    <input id="submit" type="button" value="update" class="confirm">
+                    <span id="errmsg"></span>
+                </div>
+        </form>
+        </div>
+    </div>
+    <script src="/static/js/jquery.form.js"></script>
+    <script>
+        var submitting = false
+        $("#submit").click(() => {
+            if (submitting) return
+            submitting=true
+            $("#errmsg").text("updating")
+            $("#form").ajaxSubmit({
+                type:"POST",
+                url:"/goods/update",
+                data:$("#form").serialize(),
+                dataType:"json",
+                success:data => {
+                    submitting = false
+                    if (data.code == 0) {
+                        location.href="/"
+                    } else {
+                        $("#errmsg").text(data.msg)
+                    }
+                },
+                error:(o,s,e) => {
+                    submitting = false
+                    $("#errmsg").text("error network")
+                }
+            })
+        })
+    </script>

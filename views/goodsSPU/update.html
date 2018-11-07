@@ -1,0 +1,57 @@
+
+    <div class="main_body" id="main_body">
+        <div class="breadcrub">
+            当前位置：商品>编辑商品SPU
+        </div>
+        <div class="pannel">
+            <form id="form">
+            <h3 class="review_title">编辑商品SPU</h3>
+                <input type="hidden" name="id" value="{{.goods.Id}}">
+                <div class="form_group">
+                    <label>商品SPU名称：</label>
+                    <input type="text" class="input_txt2" name="name"value="{{.goods.Name}}">
+                </div>
+                <div class="form_group">
+                    <label>商品分类：</label>
+                    <select name="typename" id="select" class="sel_opt">
+                        <option value="">Please Choose</option>
+                    {{range .types}}{{if compare .TypeName $.goods.GoodsType.TypeName}}<option selected>{{.TypeName}}</option>{{else}}<option>{{.TypeName}}</option>{{end}}{{end}}
+                    </select>
+                </div>
+                <div class="form_group">
+                    <label>商品描述：</label>
+                    <input type="text" class="input_txt2" name="desc" value="{{.goods.Desc}}">
+                </div>
+                <div class="form_group indent_group line_top">
+                    <input id="submit" type="button" value="添 加" class="confirm">
+                    <span id="errmsg"></span>
+                </div>
+        </form>
+        </div>
+    </div>
+    <script>
+        var submitting = false
+        $("#submit").click(() => {
+            if (submitting) return
+            submitting=true
+            $("#errmsg").text("adding")
+            $.ajax({
+                method:"POST",
+                url:"/goodsspu/update",
+                data:$("#form").serialize(),
+                dataType:"json",
+                success:data => {
+                    submitting = false
+                    if (data.code == 0) {
+                        location.href="/goodsspu/add"
+                    } else {
+                        $("#errmsg").text(data.msg)
+                    }
+                },
+                error:(o,s,e) => {
+                    submitting = false
+                    $("#errmsg").text("error network")
+                }
+            })
+        })
+    </script>

@@ -1,0 +1,57 @@
+
+    <div class="main_body" id="main_body">
+        <div class="breadcrub">
+            当前位置：商品>编辑分类
+        </div>
+        <div class="pannel" style="height: 810px">
+            <form id="form" enctype="multipart/form-data">
+            <h3 class="review_title">编辑商品SPU</h3>
+                <input type="hidden" name="id" value="{{.goodsType.Id}}">
+                <div class="form_group">
+                    <label>商品类型名称：</label>
+                    <input type="text" class="input_txt2" name="typename" value="{{.goodsType.TypeName}}">
+                </div>
+                <div class="form_group">
+                    <label>商品类型logo：</label>
+                    <img src="http://{{"fdfs_host" | getconfig}}:{{"fdfs_port" | getconfig}}/{{.goodsType.Logo}}">
+                    <input type="file" class="input_file"  name="logo">
+                </div>
+                <div class="form_group">
+                    <label>商品类型图片：</label>
+                    <img src="http://{{"fdfs_host" | getconfig}}:{{"fdfs_port" | getconfig}}/{{.goodsType.Image}}" width="200">
+                    <input type="file" class="input_file"  name="image">
+                </div>
+                <div class="form_group indent_group line_top">
+                    <input id="submit" type="button" value="update" class="confirm">
+                    <span id="errmsg"></span>
+                </div>
+        </form>
+        </div>
+    </div>
+    <script src="/static/js/jquery.form.js"></script>
+    <script>
+        var submitting = false
+        $("#submit").click(() => {
+            if (submitting) return
+            submitting=true
+            $("#errmsg").text("updating")
+            $("#form").ajaxSubmit({
+                type:"POST",
+                url:"/type/update",
+                data:$("#form").serialize(),
+                dataType:"json",
+                success:data => {
+                    submitting = false
+                    if (data.code == 0) {
+                        location.href="/"
+                    } else {
+                        $("#errmsg").text(data.msg)
+                    }
+                },
+                error:(o,s,e) => {
+                    submitting = false
+                    $("#errmsg").text("error network")
+                }
+            })
+        })
+    </script>

@@ -1,0 +1,134 @@
+
+    <div class="main_body" id="main_body">
+        <div class="breadcrub">
+            当前位置：商品管理>添加商品
+        </div>
+        <div class="pannel" style="height: 810px">
+            <table class="common_table">
+                <tr>
+                    <th width="31%">商品标题</th>
+                    <th width="5%">detail</th>
+                    <th width="16%">添加时间</th>
+                    <th width="7%">库存量</th>
+                    <th width="10%">商品价格</th>
+                    <th width="10%">单位</th>
+                    <th width="7">销量</th>
+                    <th width="7%">删除</th>
+                    <th width="7%">编辑</th>
+                </tr>
+            {{range .goodsList}}
+                <tr>
+                    <td>{{.GoodsSPU.Name}} {{.Name}}</td>
+                    <td><a href="/goods/detail?id={{.Id}}">查看详情</a></td>
+                    <td>{{showtime .Addtime "Asia/Saigon"}}</td>
+                    <td>{{.Stock}}</td>
+                    <td>${{.Price}}</td>
+                    <td>{{.Unit}}</td>
+                    <td>{{.Sold}}</td>
+                    <td><a href="javascript:" onclick="remove({{.Id}})">删除</a></td>
+                    <td><a href="/goods/update?id={{.Id}}">编辑</a></td>
+                </tr>
+            {{end}}
+            </table>
+            <ul class="pagenation">
+            {{if compare .page 1}}
+                {{else}}
+                <li><a href="/goods/add?p=1&goods_id={{.goods.Id}}">首页</a></li>
+                <li><a href="/goods/add?p={{.page | prepage}}&goods_id={{.goods.Id}}">上一页</a></li>
+            {{end}}
+            {{if compare .page .pageCount}}
+                {{else}}
+                <li> <a href="/goods/add?p={{nextpage .page .pageCount}}&goods_id={{.goods.Id}}">下一页</a></li>
+                <li><a href="/goods/add?p={{.pageCount}}&goods_id={{.goods.Id}}">末页</a></li>
+            {{end}}
+                <li>共{{.totalRows}}条记录/共{{.pageCount}}页/当前{{.page}}页</li>
+            </ul>
+            <form id="form" enctype="multipart/form-data">
+            <h3 class="review_title">添加商品</h3>
+                <input type="hidden" name="goods_id" value="{{.goods.Id}}">
+            <div class="form_group">
+                <label>商品名称：</label>
+                <input type="text" class="input_txt2" name="name" >
+            </div>
+            <div class="form_group">
+                <label>商品SPU：</label>
+                {{.goods.Name}}
+            </div>
+            <div class="form_group">
+                <label>商品描述：</label>
+                <textarea class="input_multxt" name="detail"></textarea>
+            </div>
+            <div class="form_group">
+                <label>商品库存：</label>
+                <input type="text" class="input_txt2" name="stock" >
+            </div>
+            <div class="form_group">
+                <label>商品价格：</label>
+                <input type="text" class="input_txt2" name="price" >
+            </div>
+            <div class="form_group">
+                <label>商品单位：</label>
+                <input type="text" class="input_txt2" name="unit" >
+            </div>
+            <div class="form_group">
+                <label>商品图片：</label>
+                <input type="file" class="input_file"  name="image">
+            </div>
+
+            <div class="form_group indent_group line_top">
+                <input id="submit" type="button" value="添 加" class="confirm">
+                <span id="errmsg"></span>
+            </div>
+        </form>
+        </div>
+</div>
+    <script src="/static/js/jquery.form.js"></script>
+    <script>
+        var submitting = false
+        $("#submit").click(() => {
+            if (submitting) return
+            submitting=true
+            $("#errmsg").text("adding")
+            $("#form").ajaxSubmit({
+                type:"POST",
+                url:"/goods/add",
+                data:$("#form").serialize(),
+                dataType:"json",
+                success:data => {
+                    submitting = false
+                    if (data.code == 0) {
+                        location.href="/"
+                    } else {
+                        $("#errmsg").text(data.msg)
+                    }
+                },
+                error:(o,s,e) => {
+                    submitting = false
+                    $("#errmsg").text("error network")
+                }
+            })
+        })
+
+        function remove(id) {
+            if (confirm("Are you sure to delete it")) {
+                $.ajax({
+                    method:"POST",
+                    url:"/goods/delete",
+                    data:{
+                        id:id
+                    },
+                    dataType:"json",
+                    success:data => {
+                        if (data.code == 0) {
+                            location.reload(true)
+                        } else {
+                            alert(data.msg)
+                        }
+                    },
+                    error:(o,s,e) => {
+                        alert("error network")
+                    }
+                })
+            }
+        }
+    </script>

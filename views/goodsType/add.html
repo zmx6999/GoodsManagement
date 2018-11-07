@@ -1,0 +1,97 @@
+<div class="main_body" id="main_body">
+        <div class="breadcrub">
+            当前位置：分类
+        </div>
+        <div class="pannel">
+            <table class="common_table">
+                <tr>
+                    <th width="10%">id</th>
+                    <th width="50%">类别名称</th>
+                    <th width="20%">详情</th>
+                    <th width="20%">管理操作</th>
+                </tr>
+                {{range .types}}
+                <tr>
+                    <td>{{.Id}}</td>
+                    <td>{{.TypeName}}</td>
+                    <td><a href="/type/detail?id={{.Id}}">查看详情</a></td>
+                    <td>
+                        <a href="/type/update?id={{.Id}}" class="edit">更新</a>
+                        <a href="javascript:" onclick="remove({{.Id}})" class="edit">删除</a>
+                    </td>
+                </tr>
+                {{end}}
+            </table>
+            <div class="pannel">
+                <form id="form" enctype="multipart/form-data">
+                    <h3 class="review_title">添加商品类型</h3>
+                    <div class="form_group">
+                        <label>商品类型名称：</label>
+                        <input type="text" class="input_txt2" name="typename" >
+                    </div>
+                    <div class="form_group">
+                        <label>商品类型logo：</label>
+                        <input type="file" class="input_file"  name="logo">
+                    </div>
+                    <div class="form_group">
+                        <label>商品类型图片：</label>
+                        <input type="file" class="input_file"  name="image">
+                    </div>
+                    <div class="form_group indent_group line_top">
+                        <input id="submit" type="button" value="添 加" class="confirm">
+                        <span id="errmsg"></span>
+                    </div>
+                </form>
+        </div>
+    </div>
+</div>
+<script src="/static/js/jquery.form.js"></script>
+<script>
+    var submitting = false
+    $("#submit").click(() => {
+        if (submitting) return
+        submitting=true
+        $("#errmsg").text("adding")
+        $("#form").ajaxSubmit({
+            type:"POST",
+            url:"/type/add",
+            data:$("#form").serialize(),
+            dataType:"json",
+            success:data => {
+                submitting = false
+                if (data.code == 0) {
+                    location.href="/type/add"
+                } else {
+                    $("#errmsg").text(data.msg)
+                }
+            },
+            error:(o,s,e) => {
+                submitting = false
+                $("#errmsg").text("error network")
+            }
+        })
+    })
+
+    function remove(id) {
+        if (confirm("Are you sure to delete it")) {
+            $.ajax({
+                method:"POST",
+                url:"/type/delete",
+                data:{
+                    id:id
+                },
+                dataType:"json",
+                success:data => {
+                    if (data.code == 0) {
+                        location.reload(true)
+                    } else {
+                        alert(data.msg)
+                    }
+                },
+                error:(o,s,e) => {
+                    alert("error network")
+                }
+            })
+        }
+    }
+</script>
